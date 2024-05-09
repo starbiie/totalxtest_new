@@ -1,12 +1,13 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:pinput/pinput.dart';
 import 'package:totalx_test/Controller/backend_servies.dart';
-// import 'package:pinput/pinput.dart';
 import 'package:totalx_test/View/userlist.dart';
 
-class OtpScreen extends StatelessWidget {
+class OtpScreen extends StatefulWidget {
   final String verificationid;
   final String mobilenumber;
   OtpScreen({
@@ -14,12 +15,55 @@ class OtpScreen extends StatelessWidget {
     required this.verificationid,
     required this.mobilenumber,
   });
+
+  @override
+  State<OtpScreen> createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
   final _formState = GlobalKey<FormState>();
 
+  late Timer _timer;
+
+  int _seconds = 59;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  void startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_seconds > 0) {
+          _seconds--;
+        } else {
+          _timer.cancel();
+        }
+      });
+    });
+  }
+
+  void resendOtp() {
+    setState(() {
+      _seconds = 59;
+      startTimer();
+    });
+  }
 
   String text = '';
+
   final otp = TextEditingController();
-BackendServices backendServices = BackendServices();
+
+  BackendServices backendServices = BackendServices();
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -46,7 +90,6 @@ BackendServices backendServices = BackendServices();
                 const Text(
                   "Enter the verification code we just sent to your\n number +91 *******21.",
                 ),
-
                 SizedBox(height: screenHeight * 0.04),
                 Align(
                   alignment: Alignment.center,
@@ -80,11 +123,25 @@ BackendServices backendServices = BackendServices();
                 ),
                 SizedBox(height: screenHeight * 0.02),
 
+                Align(
+                  alignment: Alignment.center,
+                  child: Text("${_seconds.toString().padLeft(2, '0')} Sec",style: TextStyle(color: Colors.red
+                  ),),
+                ),
+                SizedBox(height: screenHeight * 0.02),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                     Text("Don't Get OTP? "),
-                    InkWell(   onTap: (){                   Navigator.push(context, MaterialPageRoute(builder: (context) =>  UserList(),));},
+
+                    const Text("Don't Get OTP? "),
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const UserList(),
+                            ));
+                      },
                       child: Text(
                         "Resend",
                         style: TextStyle(color: HexColor("2873F0")),
@@ -96,17 +153,22 @@ BackendServices backendServices = BackendServices();
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
                   child: ElevatedButton(
-                    onPressed: () async{
-                      Navigator.push(context, MaterialPageRoute(builder: (context) =>  UserList(),));
+                    onPressed: () async {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UserList(),
+                          ));
 
                       PhoneAuthCredential credential =
-                      PhoneAuthProvider.credential(
-                          verificationId: verificationid,
-                          smsCode: otp.text);
+                          PhoneAuthProvider.credential(
+                              verificationId: widget.verificationid,
+                              smsCode: otp.text);
 
                       // Sign the user in (or link) with the credential
-                      await backendServices.firebaseAuth.signInWithCredential(credential);
-                      },
+                      await backendServices.firebaseAuth
+                          .signInWithCredential(credential);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: HexColor("100E09"),
                       shape: RoundedRectangleBorder(
@@ -124,7 +186,6 @@ BackendServices backendServices = BackendServices();
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
-
               ],
             ),
           ),

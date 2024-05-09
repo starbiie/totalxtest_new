@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../Controller/providers/userProvider.dart';
-
-void settingModalBottomSheet(
+void modalBottomSheet(
     BuildContext context, bool? isOlder, Function(bool?) sortUsers) {
   showModalBottomSheet(
     context: context,
@@ -22,44 +21,40 @@ void settingModalBottomSheet(
               children: <Widget>[
                 const Padding(
                   padding: EdgeInsets.only(left: 25.0, top: 10),
-                  child: Text(
-                    "Sort",
-                    style:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                  ),
+                  child: Text("Sort", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
                 ),
                 ListTile(
-                  leading: Radio(
+                  leading: Radio<bool?>(
                     value: null,
                     groupValue: isOlder,
-                    onChanged: (value) {
-                      sortUsers(value as bool?);
+                    onChanged: (bool? value) {
                       Navigator.pop(context);
+                      sortUsers(value);
                     },
                   ),
                   title: const Text("All"),
                 ),
                 ListTile(
-                  leading: Radio(
+                  leading: Radio<bool?>(
                     value: true,
                     groupValue: isOlder,
-                    onChanged: (value) {
-                      sortUsers(value as bool?);
+                    onChanged: (bool? value) {
                       Navigator.pop(context);
+                      sortUsers(value);
                     },
                   ),
-                  title: const Text("Age: Older"),
+                  title: const Text("Older"),
                 ),
                 ListTile(
-                  leading: Radio(
+                  leading: Radio<bool?>(
                     value: false,
                     groupValue: isOlder,
-                    onChanged: (value) {
-                      sortUsers(value as bool?);
+                    onChanged: (bool? value) {
                       Navigator.pop(context);
+                      sortUsers(value);
                     },
                   ),
-                  title: const Text("Age: Younger"),
+                  title: const Text("Younger"),
                 ),
               ],
             ),

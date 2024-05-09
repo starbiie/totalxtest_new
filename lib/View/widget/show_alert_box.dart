@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:totalx_test/Controller/providers/userProvider.dart';
 
 class ShowAlertBox extends StatelessWidget {
-  ShowAlertBox({Key? key}) : super(key: key);
+  ShowAlertBox({super.key});
 
   TextEditingController name = TextEditingController();
   TextEditingController age = TextEditingController();
@@ -148,13 +148,13 @@ class ShowAlertBox extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Padding(
-                      padding: EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(8.0),
                       child: Center(
                         child: Container(
                           height: height * 0.10,
                           decoration: BoxDecoration(shape: BoxShape.circle,
                             image: DecorationImage(
-                              fit: BoxFit.contain,
+                              fit: BoxFit.cover,
                               image: FileImage(userProvider.image!),
                             ),
                           ),

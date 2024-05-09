@@ -26,7 +26,7 @@ class BackendServices{
           );
         },
         codeSent: (String verificationId, int? resendToken) {
-          // Navigate to OTP screen after code is sent
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -37,7 +37,6 @@ class BackendServices{
           );
         },
         codeAutoRetrievalTimeout: (String verificationId) {
-          // Handle timeout
         },
       );
     } catch (e) {
@@ -49,15 +48,12 @@ class BackendServices{
     }
   }
 
-// Function to sign in with phone credential
   Future<void> signInWithPhoneCredential(
       BuildContext context, PhoneAuthCredential credential) async {
     try {
       final authResult =
       await FirebaseAuth.instance.signInWithCredential(credential);
-      // Check if the user is signed in
       if (authResult.user != null) {
-        // User signed in successfully, navigate to the next screen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -65,7 +61,6 @@ class BackendServices{
           ),
         );
       } else {
-        // Handle sign in failure
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Sign in failed'),
