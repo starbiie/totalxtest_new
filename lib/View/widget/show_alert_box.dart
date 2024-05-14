@@ -1,46 +1,18 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:totalx_test/Controller/providers/userProvider.dart';
+import '../../Controller/providers/userProvider.dart';
+import '../../Model/usermodel.dart';
 
 class ShowAlertBox extends StatelessWidget {
   ShowAlertBox({super.key});
 
   TextEditingController name = TextEditingController();
   TextEditingController age = TextEditingController();
-
-  Future<String> uploadImage(File image) async {
-    try {
-      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-      Reference reference =
-      FirebaseStorage.instance.ref().child('images/$fileName');
-      UploadTask uploadTask = reference.putFile(image);
-      TaskSnapshot storageTaskSnapshot = await uploadTask;
-      String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
-      return downloadUrl;
-    } catch (e) {
-      print('Error uploading image: $e');
-      return '';
-    }
-  }
-
-  final CollectionReference usersCollection =
-  FirebaseFirestore.instance.collection('users');
-
-  void addUser(String imageUrl) {
-    final data = {
-      'name': name.text,
-      'age': age.text,
-      'image': imageUrl
-    };
-
-    usersCollection.add(data);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +37,7 @@ class ShowAlertBox extends StatelessWidget {
                 fontSize: 19,
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            const SizedBox(height: 8),
             Align(
               alignment: Alignment.center,
               child: userProvider.image == null
@@ -87,9 +57,7 @@ class ShowAlertBox extends StatelessWidget {
                           decoration: const BoxDecoration(
                             image: DecorationImage(
                               fit: BoxFit.contain,
-                              image: AssetImage(
-                                "asset/images/user (10) 1.png",
-                              ),
+                              image: AssetImage("asset/images/user (10) 1.png"),
                             ),
                           ),
                         ),
@@ -152,7 +120,8 @@ class ShowAlertBox extends StatelessWidget {
                       child: Center(
                         child: Container(
                           height: height * 0.10,
-                          decoration: BoxDecoration(shape: BoxShape.circle,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
                             image: DecorationImage(
                               fit: BoxFit.cover,
                               image: FileImage(userProvider.image!),
@@ -206,57 +175,44 @@ class ShowAlertBox extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Text(
-              "Name",
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 10),
+            const Text("Name", style: TextStyle(fontSize: 14)),
+            const SizedBox(height: 5),
             TextField(
               controller: name,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 8),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8),
                 isDense: true,
                 filled: true,
                 fillColor: HexColor("FDFDFD"),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.black12),
+                  borderSide: BorderSide(color: HexColor("D3D3D3")),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: HexColor("D3D3D3")),
                 ),
               ),
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            const Text(
-              "Age",
-              style: TextStyle(fontSize: 14),
-            ),
-            const SizedBox(
-              height: 5,
-            ),
+            const SizedBox(height: 10),
+            const Text("Age", style: TextStyle(fontSize: 14)),
+            const SizedBox(height: 5),
             TextField(
               controller: age,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(vertical: 10.0,horizontal: 8),
+                contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 8),
                 isDense: true,
                 filled: true,
                 fillColor: HexColor("FDFDFD"),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.black12),
+                  borderSide: BorderSide(color: HexColor("D3D3D3")),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.black26),
+                  borderSide: BorderSide(color: HexColor("D3D3D3")),
                 ),
               ),
             ),
@@ -264,50 +220,31 @@ class ShowAlertBox extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(HexColor("CCCCCC")),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
               "Cancel",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: HexColor("000000"),
-              ),
+              style: TextStyle(color: Colors.black),
             ),
           ),
           TextButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(HexColor("1782FF")),
-              shape: MaterialStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-              ),
-            ),
             onPressed: () async {
-              if (userProvider.image != null) {
-                String imageUrl = await uploadImage(userProvider.image!);
-                addUser(imageUrl);
+              if (name.text.isNotEmpty && age.text.isNotEmpty && userProvider.image != null) {
+                String imageUrl = await userProvider.uploadImage(userProvider.image!);
+                UserModel userModel = UserModel(
+                  userid: DateTime.now().millisecondsSinceEpoch.toString(),
+                  name: name.text,
+                  age: age.text,
+                  imageUrl: imageUrl,
+                );
+                userProvider.addUser(userModel);
+                Navigator.of(context).pop();
               }
-              Navigator.of(context).pop();
             },
             child: const Text(
-              "Save",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              "Add",
+              style: TextStyle(color: Colors.black),
             ),
-          )
+          ),
         ],
       ),
     );
